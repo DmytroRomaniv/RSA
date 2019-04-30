@@ -8,38 +8,36 @@ namespace RSA
 {
     public class RsaAlgorythm
     {
-        public double _nValue;
-        public double _qValue;
+        public BigInteger _nValue;
+        public BigInteger _qValue;
 
-        public RsaAlgorythm(double nValue, double qValue)
+        public RsaAlgorythm(BigInteger nValue, BigInteger qValue)
         {
-            if (nValue <= 0 || !IsPrimal(nValue))
+            if (nValue <= 0 || !IsPrime(nValue))
             {
-                _nValue = GenerateRandomPrimalDouble();
+                _nValue = GenerateRandomPrimeInteger();
             }
             else
             {
                 _nValue = nValue;
             }
 
-            if (qValue <= 0 || !IsPrimal(qValue))
+            if (qValue <= 0 || !IsPrime(qValue))
             {
                 _qValue = _nValue;
 
                 while (_nValue == _qValue)
                 {
-                    _qValue = GenerateRandomPrimalDouble();
+                    _qValue = GenerateRandomPrimeInteger();
                 }
             }
             else
             {
                 _qValue = qValue;
             }
-
-            double n = _qValue * _nValue;
         }
 
-        public bool IsPrimal(double value, int numberOfTests = 512)
+        public bool IsPrime(BigInteger value, int numberOfTests = 512)
         {
             if (value == 2 || value == 3)
             {
@@ -55,11 +53,11 @@ namespace RSA
             while (range % 2 == 0)
             {
                 start++;
-                range = Math.Floor(range / 2);
+                range = range / 2;
             }
             for (var i = 0; i < numberOfTests; i++)
             {
-                var randomNumber = GenerateRandomDouble(value - 1);
+                var randomNumber = GenerateRandomInteger();
                 var x = ModularMultiplication(randomNumber, range, value);
                 if (x != 1 && x != value - 1)
                 {
@@ -84,11 +82,11 @@ namespace RSA
 
         
 
-        public double ModularMultiplication(double value, double powerValue, double modularValue)
+        public BigInteger ModularMultiplication(BigInteger value, BigInteger powerValue, BigInteger modularValue)
         {
-            var result = 0.0;
-            var binaryPowerValue = ConvertToBinary(powerValue).Reverse();
-            var firstValue = 1.0;
+            var result = new BigInteger(0);
+            var binaryPowerValue = powerValue.ToByteArray().Reverse();
+            var firstValue = new BigInteger(1);
             var lastValue = value;
 
 
@@ -98,7 +96,7 @@ namespace RSA
                 {
                     firstValue = (firstValue * lastValue) % modularValue;
                 }
-                lastValue = Math.Pow(firstValue, 2) % modularValue;
+                lastValue = BigInteger.Pow(firstValue, 2) % modularValue;
 
             }
 
@@ -107,7 +105,7 @@ namespace RSA
             return result;
         }
 
-        public IEnumerable<byte> ConvertToBinary(double value)
+        public IEnumerable<byte> ConvertToBinary(BigInteger value)
         {
             var binaryNumber = new List<byte>();
 
@@ -126,13 +124,27 @@ namespace RSA
             return binaryNumber;
         }
 
-        private double GenerateRandomPrimalDouble()
+        public BigInteger GenerateRandomInteger(int length = 1024)
         {
-            var result = 4.0;
-            while (!IsPrimal(result))
+            byte[] bytes = new byte[length];
+            BigInteger result;
+            var random = new Random();
+
+            random.NextBytes(bytes);
+            bytes[bytes.Length - 1] &= (byte)0x7F;
+            result = new BigInteger(bytes);
+
+            return result;
+        }
+    
+        public BigInteger GenerateRandomPrimeInteger(int length = 1024)
+        {
+            var result = new BigInteger(4);
+
+            do
             {
-                result = GenerateRandomDouble((double)int.MaxValue + int.MaxValue);
-            }
+                result = GenerateRandomInteger();
+            } while (!IsPrime(result));
 
             return result;
         }

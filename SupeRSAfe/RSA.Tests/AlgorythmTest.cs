@@ -12,8 +12,8 @@ namespace RSA.Tests
             var rsa = new RsaAlgorythm(0, 0);
             var primeNumber = 127;
 
-            Assert.True(rsa.IsPrimal(rsa._nValue));
-            Assert.True(rsa.IsPrimal(rsa._qValue));
+            Assert.True(rsa.IsPrime(rsa._nValue));
+            Assert.True(rsa.IsPrime(rsa._qValue));
         }
     }
 }
