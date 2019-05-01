@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RSA.Interfaces
 {
-    interface IEncryptionAlgorythm
+    public interface IEncryptionAlgorythm
     {
         byte[] Encrypt(byte[] message);
 

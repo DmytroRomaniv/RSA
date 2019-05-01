@@ -3,30 +3,31 @@ using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
 using System.Linq;
+using RSA.Interfaces;
 
 namespace RSA
 {
-    public class RsaAlgorythm
+    public class RsaAlgorythm: IEncryptionAlgorythm
     {
-        public BigInteger _nValue;
+        public BigInteger _pValue;
         public BigInteger _qValue;
 
         public RsaAlgorythm(BigInteger nValue, BigInteger qValue)
         {
             if (nValue <= 0 || !IsPrime(nValue))
             {
-                _nValue = GenerateRandomPrimeInteger();
+                _pValue = GenerateRandomPrimeInteger();
             }
             else
             {
-                _nValue = nValue;
+                _pValue = nValue;
             }
 
             if (qValue <= 0 || !IsPrime(qValue))
             {
-                _qValue = _nValue;
+                _qValue = _pValue;
 
-                while (_nValue == _qValue)
+                while (_pValue == _qValue)
                 {
                     _qValue = GenerateRandomPrimeInteger();
                 }
@@ -35,6 +36,20 @@ namespace RSA
             {
                 _qValue = qValue;
             }
+        }
+
+        public byte[] Encrypt(byte[] message)
+        {
+            var nValue = _pValue * _qValue;
+            var eulerValue = CalculateEulerFunction(_pValue, _qValue);
+            var eValue = GenerateCoprimeInteger(eulerValue);
+
+            return new byte[0];
+        }
+
+        public byte[] Decrypt(byte[] encryptedMessage)
+        {
+            return new byte[0];
         }
 
         public bool IsPrime(BigInteger value, int numberOfTests = 512)
@@ -79,7 +94,6 @@ namespace RSA
             }
             return true;
         }
-
         
 
         public BigInteger ModularMultiplication(BigInteger value, BigInteger powerValue, BigInteger modularValue)
@@ -149,39 +163,52 @@ namespace RSA
             return result;
         }
 
-        private double GenerateRandomDouble(double value)
+        public BigInteger CalculateEulerFunction(BigInteger pValue, BigInteger qValue)
         {
-            var random = new Random();
-            var randomNumber = 0.0;
-
-            if(value < int.MaxValue)
-            {
-                randomNumber = random.Next(2, (int)value);
-                return randomNumber;
-            }
-            else
-            {
-                for(int i = 0; i< value / int.MaxValue; i++)
-                {
-                    randomNumber += random.Next(2, int.MaxValue);
-                }
-                var remainder = value % int.MaxValue;
-                if (remainder > 2)
-                {
-                    randomNumber += random.Next(2, (int)remainder);
-                }
-                return randomNumber;
-            }
-
+            var eulerFunctionResult = (pValue - 1) * (qValue - 1);
+            return eulerFunctionResult;
         }
-        private double CalculateModulo(double value, double moduloValue)
+
+        public BigInteger GenerateCoprimeInteger(BigInteger primeValue)
         {
-            while(value > moduloValue)
+
+            var random = new Random();
+            BigInteger randomPrimeInteger = primeValue + 1;
+
+            while (!(randomPrimeInteger < primeValue && AreItegersCoprime(primeValue, randomPrimeInteger)))
             {
-                value -= moduloValue;
+                var randomLength = random.Next(64, 1025);
+                randomPrimeInteger = GenerateRandomPrimeInteger(randomLength);
             }
 
-            return value;
+            return randomPrimeInteger;
+        }
+
+        public bool AreItegersCoprime(BigInteger firstValue, BigInteger secondValue)
+        {
+            if (firstValue == secondValue)
+            {
+                return false;
+            }
+
+            while (firstValue > 1 && secondValue > 1)
+            {
+                if (firstValue < secondValue)
+                {
+                    SwapIntegers(ref firstValue, ref secondValue);
+                }
+
+                firstValue = firstValue % secondValue;
+            }
+
+            return (firstValue == 1 || secondValue == 1);
+        }
+
+        private void SwapIntegers(ref BigInteger firstValue, ref BigInteger secondValue)
+        {
+            var saveValue = firstValue;
+            firstValue = secondValue;
+            secondValue = saveValue;
         }
     }
 }
