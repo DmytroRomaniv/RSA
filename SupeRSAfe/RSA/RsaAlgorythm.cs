@@ -210,5 +210,36 @@ namespace RSA
             firstValue = secondValue;
             secondValue = saveValue;
         }
+
+        public BigInteger UseExtendedEuclid( BigInteger firstValue,  BigInteger secondValue)
+        {
+            //var x0 = new BigInteger(1);
+            //var xn = new BigInteger(1);
+            //var y0 = new BigInteger(0);
+            //var yn = new BigInteger(0);
+            //var x1 = new BigInteger(0);
+            //var y1 = new BigInteger(1);
+            //var r = firstValue % secondValue;
+            //BigInteger q;
+
+            //while (r > 0)
+            //{
+            //    q = firstValue / secondValue;
+            //    xn = x0 - q * x1;
+            //    yn = y0 - q * y1;
+
+            //    x0 = x1;
+            //    y0 = y1;
+            //    x1 = xn;
+            //    y1 = yn;
+            //    firstValue = secondValue;
+            //    secondValue = r;
+            //    r = firstValue % secondValue;
+            //}
+
+            //return xn < yn ? xn : yn;
+
+            return BigInteger.ModPow(firstValue, secondValue - 1, secondValue);
+        }
     }
 }

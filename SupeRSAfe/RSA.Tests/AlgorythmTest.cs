@@ -33,5 +33,16 @@ namespace RSA.Tests
             
             Assert.True(rsa.AreItegersCoprime(rsa.GenerateCoprimeInteger(euler), euler));
         }
+
+        [Fact]
+        public void EucledSmallNumbersTest()
+        {
+            var rsa = new RsaAlgorythm(0, 0);
+            var a = new BigInteger(9167368);
+            var b = new BigInteger(3);
+            var res = rsa.UseExtendedEuclid(b, a);
+
+            Assert.Equal( a % b, 1);
+        }
     }
 }
