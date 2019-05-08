@@ -38,11 +38,22 @@ namespace RSA.Tests
         public void EucledSmallNumbersTest()
         {
             var rsa = new RsaAlgorythm(0, 0);
-            var a = new BigInteger(9167368);
-            var b = new BigInteger(3);
-            var res = rsa.UseExtendedEuclid(b, a);
+            var a = new BigInteger(3);
+            var b = new BigInteger(9167368);
+            var eulerValue = rsa.CalculateEulerFunction(rsa._pValue, rsa._qValue);
+            var eValue = rsa.GenerateCoprimeInteger(eulerValue);
 
-            Assert.Equal( a % b, 1);
+            BigInteger y;
+            var res = rsa.UseExtendedEuclid(eValue, eulerValue);
+
+            Assert.Equal( eValue*res % eulerValue, 1);
+        }
+
+        [Fact]
+        public void EncryptTest()
+        {
+            var rsa = new RsaAlgorythm(3557, 2579);
+            var message = new byte[]
         }
     }
 }

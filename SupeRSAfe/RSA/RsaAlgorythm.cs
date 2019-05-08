@@ -42,7 +42,14 @@ namespace RSA
         {
             var nValue = _pValue * _qValue;
             var eulerValue = CalculateEulerFunction(_pValue, _qValue);
-            var eValue = GenerateCoprimeInteger(eulerValue);
+            var secretKey = GenerateCoprimeInteger(eulerValue);
+
+            var dividedMessage = DivideMessage(message);
+
+            foreach(var subMessage in dividedMessage)
+            {
+
+            }
 
             return new byte[0];
         }
@@ -211,35 +218,49 @@ namespace RSA
             secondValue = saveValue;
         }
 
-        public BigInteger UseExtendedEuclid( BigInteger firstValue,  BigInteger secondValue)
+        private byte[,] DivideMessage(byte[] message)
         {
-            //var x0 = new BigInteger(1);
-            //var xn = new BigInteger(1);
-            //var y0 = new BigInteger(0);
-            //var yn = new BigInteger(0);
-            //var x1 = new BigInteger(0);
-            //var y1 = new BigInteger(1);
-            //var r = firstValue % secondValue;
-            //BigInteger q;
+            var numberOfDivision = message.Length / 1024;
+            var dividedMessage = new byte[numberOfDivision, 1024];
 
-            //while (r > 0)
-            //{
-            //    q = firstValue / secondValue;
-            //    xn = x0 - q * x1;
-            //    yn = y0 - q * y1;
+            for(var i = 0; i <= numberOfDivision; i++)
+            {
+                for(int j = 0; j < 1024; j++)
+                {
+                    dividedMessage[i, j] = message[j % 1024];
+                }
+            }
 
-            //    x0 = x1;
-            //    y0 = y1;
-            //    x1 = xn;
-            //    y1 = yn;
-            //    firstValue = secondValue;
-            //    secondValue = r;
-            //    r = firstValue % secondValue;
-            //}
+            return dividedMessage;
+        }
 
-            //return xn < yn ? xn : yn;
+        public BigInteger UseExtendedEuclid(BigInteger firstValue, BigInteger secondValue)
+        {
+            var saveValue = secondValue;
+            BigInteger x0 = 1;
+            BigInteger xn = 1;
+            BigInteger x1 = 0;
+            BigInteger f;
+            BigInteger resultValue = firstValue % secondValue;
 
-            return BigInteger.ModPow(firstValue, secondValue - 1, secondValue);
+            while (resultValue > 0)
+            {
+                f = firstValue / secondValue;
+                xn = x0 - f * x1;
+
+                x0 = x1;
+                x1 = xn;
+                firstValue = secondValue;
+                secondValue = resultValue;
+                resultValue = firstValue % secondValue;
+            }
+
+            if(xn < 0)
+            {
+                xn = saveValue + xn;
+            }
+
+            return xn;
         }
     }
 }
