@@ -7,16 +7,22 @@ namespace RSA.Tests
 {
     public class AlgorythmTest
     {
+        //[Fact]
+        //public void SmallNumbersTest()
+        //{
+        //    var rsa = new RsaAlgorythm(0, 0);
+        //    var primeNumber = 127;
+        //}
+       
+
         [Fact]
-        public void SmallNumbersTest()
+        public void generatePrime()
         {
-            var rsa = new RsaAlgorythm(0, 0);
-            var primeNumber = 127;
+            var rsa = new RsaAlgorythm(2, 3);
+            var prime = rsa.GenerateRandomPrimeInteger();
 
-            Assert.True(rsa.IsPrime(rsa._pValue));
-            Assert.True(rsa.IsPrime(rsa._qValue));
+            Assert.True(rsa.FermatsIsPrime(1454215907));
         }
-
         [Fact]
         public void CoprimeSmallNumbersTest()
         {
@@ -53,7 +59,6 @@ namespace RSA.Tests
         public void EncryptTest()
         {
             var rsa = new RsaAlgorythm(3557, 2579);
-            var message = new byte[]
         }
     }
 }

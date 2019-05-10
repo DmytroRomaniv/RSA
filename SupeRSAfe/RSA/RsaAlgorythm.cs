@@ -4,6 +4,7 @@ using System.Text;
 using System.Numerics;
 using System.Linq;
 using RSA.Interfaces;
+using System.Security.Cryptography;
 
 namespace RSA
 {
@@ -14,7 +15,7 @@ namespace RSA
 
         public RsaAlgorythm(BigInteger nValue, BigInteger qValue)
         {
-            if (nValue <= 0 || !IsPrime(nValue))
+            if (nValue <= 0 || !FermatsIsPrime(nValue))
             {
                 _pValue = GenerateRandomPrimeInteger();
             }
@@ -23,7 +24,7 @@ namespace RSA
                 _pValue = nValue;
             }
 
-            if (qValue <= 0 || !IsPrime(qValue))
+            if (qValue <= 0 || !FermatsIsPrime(qValue))
             {
                 _qValue = _pValue;
 
@@ -59,7 +60,7 @@ namespace RSA
             return new byte[0];
         }
 
-        public bool IsPrime(BigInteger value, int numberOfTests = 512)
+        public bool FermatsIsPrime(BigInteger value, int numberOfTests = 128)
         {
             if (value == 2 || value == 3)
             {
@@ -69,39 +70,43 @@ namespace RSA
             {
                 return false;
             }
-
-            var start = 0;
-            var range = value - 1;
-            while (range % 2 == 0)
+            
+            var range = (long)value - 1;
+            var random = new Random();
+            var strongPrimesArray = new int[] { 2, 3, 5, 7, 11, 13, 17 };
+            if (FindSanD(range, out var s, out var d))
             {
-                start++;
-                range = range / 2;
-            }
-            for (var i = 0; i < numberOfTests; i++)
-            {
-                var randomNumber = GenerateRandomInteger();
-                var x = ModularMultiplication(randomNumber, range, value);
-                if (x != 1 && x != value - 1)
+                foreach (var strongPrime in strongPrimesArray)
                 {
-                    var j = 1;
-                    while (j < start && x != value - 1)
+                    if (ModularMultiplication(strongPrime, new BigInteger(d), value) != 1)
                     {
-                        x = ModularMultiplication(x, 2, value);
-                        if (x == 1)
+                        for (int i = 0; i < numberOfTests; i++)
                         {
-                            return false;
+                            var r = LongRandom(1, s, random);
+                            if (ModularMultiplication((long)Math.Pow(strongPrime, d), (long)Math.Pow(2, r), value) == -1)
+                            {
+                                return false;
+                            }
                         }
-                        j += 1;
-                    }
-                    if (x != value - 1)
-                    {
-                        return false;
                     }
                 }
+                return true;
             }
-            return true;
+            return false;
         }
-        
+        private bool FindSanD(long range, out long s, out double d)
+        {
+            var half = range / 2;
+            d = 2;
+            s = 1;
+            while(!((Math.Pow(2, s)*d == range) && Math.Round(d) == d && d%2==1) && d > 1)
+            {
+                s++;
+                d = half / Math.Pow(2, s);
+            }
+
+            return d > 1;
+        }
 
         public BigInteger ModularMultiplication(BigInteger value, BigInteger powerValue, BigInteger modularValue)
         {
@@ -145,19 +150,29 @@ namespace RSA
             return binaryNumber;
         }
 
-        public BigInteger GenerateRandomInteger(int length = 1024)
+        public BigInteger GenerateRandomInteger()
         {
-            byte[] bytes = new byte[length];
             BigInteger result;
             var random = new Random();
 
-            random.NextBytes(bytes);
-            bytes[bytes.Length - 1] &= (byte)0x7F;
-            result = new BigInteger(bytes);
+            var randomInteger = LongRandom(2, 300000000000000, random);
+            result = new BigInteger(randomInteger);
 
             return result;
         }
-    
+
+        private long LongRandom(long min, long max, Random rand)
+        {
+            Random random = new Random();
+            byte[] buf = new byte[45];
+            foreach(var bit in buf)
+            {
+                bit = random.Next(0, 2);
+            }
+
+            return (Math.Abs(longRand % (max - min)) + min);
+        }
+
         public BigInteger GenerateRandomPrimeInteger(int length = 1024)
         {
             var result = new BigInteger(4);
@@ -165,7 +180,7 @@ namespace RSA
             do
             {
                 result = GenerateRandomInteger();
-            } while (!IsPrime(result));
+            } while (!FermatsIsPrime(result));
 
             return result;
         }

@@ -10,7 +10,6 @@ namespace RSA.Entities
         {
             get
             {
-
                 return MessageBytes;
             }
             set
@@ -27,6 +26,11 @@ namespace RSA.Entities
                     MessageBytes = value;
                 }
             }
+        }
+
+        private byte[] FillToSize(byte[] message)
+        {
+            return null;
         }
     }
 }
