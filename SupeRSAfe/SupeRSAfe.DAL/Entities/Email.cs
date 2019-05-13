@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SupeRSAfe.DAL
+namespace SupeRSAfe.DAL.Entities
 {
-    class Email
+    public class Email
     {
+        public int Id { get; set; }
         public string Sender { get; set; }
         
-        public string[] Receivers { get; set; }
+        public User Receiver { get; set; }
 
-        public byte[] Message { get; set; }
+        public long[] Message { get; set; }
 
         public DateTime Date { get; set; }
     }

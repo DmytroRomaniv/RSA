@@ -48,8 +48,7 @@ namespace RSA.Tests
             var b = new BigInteger(9167368);
             var eulerValue = rsa.CalculateEulerFunction(rsa._pValue, rsa._qValue);
             var eValue = rsa.GenerateCoprimeInteger(eulerValue);
-
-            BigInteger y;
+            
             var res = rsa.UseExtendedEuclid(eValue, eulerValue);
 
             Assert.Equal( eValue*res % eulerValue, 1);

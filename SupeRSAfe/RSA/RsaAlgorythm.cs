@@ -12,6 +12,7 @@ namespace RSA
     {
         public BigInteger _pValue;
         public BigInteger _qValue;
+        private Random _random = new Random((int)DateTime.Now.ToBinary());
 
         public RsaAlgorythm(BigInteger nValue, BigInteger qValue)
         {
@@ -72,7 +73,6 @@ namespace RSA
             }
             
             var range = (long)value - 1;
-            var random = new Random();
             var strongPrimesArray = new int[] { 2, 3, 5, 7, 11, 13, 17 };
             if (FindSanD(range, out var s, out var d))
             {
@@ -82,7 +82,7 @@ namespace RSA
                     {
                         for (int i = 0; i < numberOfTests; i++)
                         {
-                            var r = LongRandom(1, s, random);
+                            var r = LongRandom(1, s, _random);
                             if (ModularMultiplication((long)Math.Pow(strongPrime, d), (long)Math.Pow(2, r), value) == -1)
                             {
                                 return false;
@@ -153,9 +153,8 @@ namespace RSA
         public BigInteger GenerateRandomInteger()
         {
             BigInteger result;
-            var random = new Random();
 
-            var randomInteger = LongRandom(2, 300000000000000, random);
+            var randomInteger = LongRandom(2, 300000000000000, _random);
             result = new BigInteger(randomInteger);
 
             return result;
@@ -163,14 +162,13 @@ namespace RSA
 
         private long LongRandom(long min, long max, Random rand)
         {
-            Random random = new Random();
             byte[] buf = new byte[45];
-            foreach(var bit in buf)
+            for(int i=0; i< buf.Length; i++)
             {
-                bit = random.Next(0, 2);
+                buf[i] = (byte)_random.Next(0, 2);
             }
 
-            return (Math.Abs(longRand % (max - min)) + min);
+            return (Math.Abs(1 % (max - min)) + min);
         }
 
         public BigInteger GenerateRandomPrimeInteger(int length = 1024)
@@ -193,7 +191,6 @@ namespace RSA
 
         public BigInteger GenerateCoprimeInteger(BigInteger primeValue)
         {
-
             var random = new Random();
             BigInteger randomPrimeInteger = primeValue + 1;
 
