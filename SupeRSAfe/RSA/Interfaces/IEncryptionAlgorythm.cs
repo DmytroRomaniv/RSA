@@ -6,7 +6,7 @@ namespace RSA.Interfaces
 {
     public interface IEncryptionAlgorythm
     {
-        byte[] Encrypt(byte[] message);
+        int[] Encrypt(int[] message);
 
         byte[] Decrypt(byte[] encryptedMessage);
     }

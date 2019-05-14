@@ -7,13 +7,16 @@ namespace RSA.Tests
 {
     public class AlgorythmTest
     {
-        //[Fact]
-        //public void SmallNumbersTest()
-        //{
-        //    var rsa = new RsaAlgorythm(0, 0);
-        //    var primeNumber = 127;
-        //}
-       
+        [Fact]
+        public void SmallNumbersTest()
+        {
+            var rsa = new RsaAlgorythm(3557, 2579);
+            var message = new int[] { 111, 111 };
+            var encrMessage = rsa.Encrypt(message);
+            var expMessage = new int[] { 4, 51, 753 };
+            Assert.Equal(expMessage, encrMessage);
+        }
+
 
         [Fact]
         public void generatePrime()

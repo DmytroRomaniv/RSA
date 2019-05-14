@@ -8,6 +8,8 @@ namespace Tust
         {
             var a = "Hello World!";
 
+            byte aa = 4;
+
             var b = System.Text.Encoding.UTF8.GetBytes(a);
 
             var c = System.Text.Encoding.UTF8.GetString(b);
@@ -19,6 +21,8 @@ namespace Tust
 
             Console.WriteLine();
             Console.WriteLine(c);
+
+            Console.WriteLine(aa.ToString("D3"));
         }
     }
 }
