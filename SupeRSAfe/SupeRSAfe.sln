@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RSA", "RSA\RSA.csproj", "{6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RSA.Tests", "RSA.Tests\RSA.Tests.csproj", "{EB783715-157E-40D5-94B7-C0960C818EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupeRSAfe.DTO", "SupeRSAfe.DTO\SupeRSAfe.DTO.csproj", "{86778467-43AB-45E8-BA65-0F322F282407}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SupeRSAfe.DTO", "SupeRSAfe.DTO\SupeRSAfe.DTO.csproj", "{86778467-43AB-45E8-BA65-0F322F282407}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tust", "Tust\Tust.csproj", "{D1279D3F-7337-4BFD-9CC5-F5A4D9D1500A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{86778467-43AB-45E8-BA65-0F322F282407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86778467-43AB-45E8-BA65-0F322F282407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86778467-43AB-45E8-BA65-0F322F282407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1279D3F-7337-4BFD-9CC5-F5A4D9D1500A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1279D3F-7337-4BFD-9CC5-F5A4D9D1500A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1279D3F-7337-4BFD-9CC5-F5A4D9D1500A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1279D3F-7337-4BFD-9CC5-F5A4D9D1500A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

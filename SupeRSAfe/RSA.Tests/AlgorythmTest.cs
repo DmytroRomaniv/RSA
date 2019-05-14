@@ -21,7 +21,7 @@ namespace RSA.Tests
             var rsa = new RsaAlgorythm(2, 3);
             var prime = rsa.GenerateRandomPrimeInteger();
 
-            Assert.True(rsa.FermatsIsPrime(1454215907));
+            Assert.True(rsa.FermatsIsPrime(40168526266853));
         }
         [Fact]
         public void CoprimeSmallNumbersTest()

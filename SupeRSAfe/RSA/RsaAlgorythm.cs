@@ -12,7 +12,17 @@ namespace RSA
     {
         public BigInteger _pValue;
         public BigInteger _qValue;
-        private Random _random = new Random((int)DateTime.Now.ToBinary());
+        private Random _random = new Random();
+
+        public RsaAlgorythm()
+        {
+            _pValue = GenerateRandomPrimeInteger();
+            _qValue = _pValue;
+            while (_pValue == _qValue)
+            {
+                _qValue = GenerateRandomPrimeInteger();
+            }
+        }
 
         public RsaAlgorythm(BigInteger nValue, BigInteger qValue)
         {
@@ -96,16 +106,15 @@ namespace RSA
         }
         private bool FindSanD(long range, out long s, out double d)
         {
-            var half = range / 2;
-            d = 2;
+            d = 3;
             s = 1;
-            while(!((Math.Pow(2, s)*d == range) && Math.Round(d) == d && d%2==1) && d > 1)
+            while(!((Math.Pow(2, s)*d == range) && Math.Round(d) == d && d%2==1) && d >= 3)
             {
                 s++;
-                d = half / Math.Pow(2, s);
+                d = range / Math.Pow(2, s);
             }
 
-            return d > 1;
+            return d >= 3;
         }
 
         public BigInteger ModularMultiplication(BigInteger value, BigInteger powerValue, BigInteger modularValue)
@@ -168,7 +177,8 @@ namespace RSA
                 buf[i] = (byte)_random.Next(0, 2);
             }
 
-            return (Math.Abs(1 % (max - min)) + min);
+            var longRand = BitConverter.ToInt64(buf);
+            return (Math.Abs(longRand % (max - min)) + min);
         }
 
         public BigInteger GenerateRandomPrimeInteger(int length = 1024)

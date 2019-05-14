@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Numerics;
 using AutoMapper;
 using SupeRSAfe.BLL.Interfaces;
 using SupeRSAfe.DAL.Entities;
@@ -25,6 +26,7 @@ namespace SupeRSAfe.BLL.Services
         public void Create(EmailDTO emailDTO)
         {
             var email = _mapper.Map<Email>(emailDTO);
+
 
             _unitOfWork.EmailRepository.Create(email);
             _unitOfWork.Save();
