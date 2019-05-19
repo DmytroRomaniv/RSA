@@ -11,7 +11,7 @@ namespace SupeRSAfe.DAL.Entities
         
         public User Receiver { get; set; }
 
-        public long[] Message { get; set; }
+        public string Message { get; set; }
 
         public DateTime Date { get; set; }
     }

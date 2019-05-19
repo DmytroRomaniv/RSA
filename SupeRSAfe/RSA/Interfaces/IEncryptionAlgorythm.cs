@@ -6,8 +6,8 @@ namespace RSA.Interfaces
 {
     public interface IEncryptionAlgorythm
     {
-        int[] Encrypt(int[] message);
+        string Encrypt(string message);
 
-        byte[] Decrypt(byte[] encryptedMessage);
+        string Decrypt(string encryptedMessage);
     }
 }

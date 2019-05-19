@@ -10,11 +10,11 @@ namespace RSA.Tests
         [Fact]
         public void SmallNumbersTest()
         {
-            var rsa = new RsaAlgorythm(3557, 2579);
-            var message = new int[] { 111, 111 };
+            var rsa = new RsaAlgorythm();
+            var message = "111111";
             var encrMessage = rsa.Encrypt(message);
-            var expMessage = new int[] { 4, 51, 753 };
-            Assert.Equal(expMessage, encrMessage);
+            var decMessage = rsa.Decrypt(encrMessage);
+            Assert.True(decMessage.Contains(message));
         }
 
 
@@ -22,9 +22,9 @@ namespace RSA.Tests
         public void generatePrime()
         {
             var rsa = new RsaAlgorythm(2, 3);
-            var prime = rsa.GenerateRandomPrimeInteger();
+            var prime = rsa.GenerateRandomPrimeInteger(long.MaxValue);
 
-            Assert.True(rsa.FermatsIsPrime(40168526266853));
+            Assert.True(rsa.FermatsIsPrime(prime));
         }
         [Fact]
         public void CoprimeSmallNumbersTest()
@@ -38,7 +38,7 @@ namespace RSA.Tests
         public void CoprimeNumbersTest()
         {
             var rsa = new RsaAlgorythm(0,0);
-            var euler = rsa.CalculateEulerFunction(rsa._pValue, rsa._qValue);
+            var euler = rsa.CalculateEulerFunction(rsa.PValue, rsa.QValue);
             
             Assert.True(rsa.AreItegersCoprime(rsa.GenerateCoprimeInteger(euler), euler));
         }
@@ -49,7 +49,7 @@ namespace RSA.Tests
             var rsa = new RsaAlgorythm(0, 0);
             var a = new BigInteger(3);
             var b = new BigInteger(9167368);
-            var eulerValue = rsa.CalculateEulerFunction(rsa._pValue, rsa._qValue);
+            var eulerValue = rsa.CalculateEulerFunction(rsa.PValue, rsa.QValue);
             var eValue = rsa.GenerateCoprimeInteger(eulerValue);
             
             var res = rsa.UseExtendedEuclid(eValue, eulerValue);
@@ -61,6 +61,14 @@ namespace RSA.Tests
         public void EncryptTest()
         {
             var rsa = new RsaAlgorythm(3557, 2579);
+        }
+
+        [Fact]
+        public void ModuloMultiplication()
+        {
+            var rsa = new RsaAlgorythm(2, 3);
+            var resul = rsa.ModularMultiplication(175, 235, 257);
+            Assert.Equal(resul, 3);
         }
     }
 }
