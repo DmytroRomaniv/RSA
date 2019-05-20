@@ -1,8 +1,49 @@
-﻿@{
+﻿@model SupeRSAfe.DTO.Manage.MainViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 main">
+            @if (Model.Emails != null)
+            {
+                <ul>
+                    @foreach (var email in Model.Emails)
+                    {
+                        <li>@email.Date   @email.Subject</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <h3>Mailbox is empty</h3>
+            }
+        </div>
+        <div class="col-sm-6 main">
+            @if (Model.ChosenEmail != null)
+            {
+                <p>@Model.ChosenEmail.Message</p>
+            }
+            else
+            {
+                <h3>Choose an email.</h3>
+            }
+        </div>
+        <div class="col-sm-2 main">
+            @if (Model.Keys != null)
+            {
+                <ul>
+                    @foreach (var key in Model.Keys)
+                    {
+                        <li>@key.OpenKey</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <h3>Mailbox is empty</h3>
+            }
+        </div>
+    </div>
 </div>

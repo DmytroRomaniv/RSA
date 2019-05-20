@@ -9,10 +9,9 @@ using SupeRSAfe.DAL.Repositories;
 
 namespace SupeRSAfe.DAL
 {
-    public class UnitOfWork : IUnitOfWork, IDisposable
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly MailDbContext _dbContext;
-        private bool isDisposed;
 
         private IRepository<Email> _emailRepository;
         public IRepository<Email> EmailRepository
@@ -59,24 +58,6 @@ namespace SupeRSAfe.DAL
         public async void Save()
         {
             await _dbContext.SaveChangesAsync();
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed)
-            {
-                if (disposing)
-                {
-                    _dbContext.Dispose();
-                }
-                this.isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

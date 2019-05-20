@@ -8,20 +8,20 @@ namespace RSA.Tests
     public class AlgorythmTest
     {
         [Fact]
-        public void SmallNumbersTest()
+        public async void SmallNumbersTest()
         {
-            var rsa = new RsaAlgorythm();
-            var message = "111111";
-            var encrMessage = rsa.Encrypt(message);
-            var decMessage = rsa.Decrypt(encrMessage);
-            Assert.True(decMessage.Contains(message));
+            var rsa = new RsaAlgorithm();
+            var message = "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+            var encrMessage = await rsa.Encrypt(message);
+            var decMessage = await rsa.Decrypt(encrMessage);
+            Assert.Contains(message, decMessage);
         }
 
 
         [Fact]
         public void generatePrime()
         {
-            var rsa = new RsaAlgorythm(2, 3);
+            var rsa = new RsaAlgorithm(2, 3);
             var prime = rsa.GenerateRandomPrimeInteger(long.MaxValue);
 
             Assert.True(rsa.FermatsIsPrime(prime));
@@ -29,7 +29,7 @@ namespace RSA.Tests
         [Fact]
         public void CoprimeSmallNumbersTest()
         {
-            var rsa = new RsaAlgorythm(0,0);
+            var rsa = new RsaAlgorithm(0,0);
 
             Assert.True(rsa.AreItegersCoprime(7,10));
         }
@@ -37,7 +37,7 @@ namespace RSA.Tests
         [Fact]
         public void CoprimeNumbersTest()
         {
-            var rsa = new RsaAlgorythm(0,0);
+            var rsa = new RsaAlgorithm(0,0);
             var euler = rsa.CalculateEulerFunction(rsa.PValue, rsa.QValue);
             
             Assert.True(rsa.AreItegersCoprime(rsa.GenerateCoprimeInteger(euler), euler));
@@ -46,7 +46,7 @@ namespace RSA.Tests
         [Fact]
         public void EucledSmallNumbersTest()
         {
-            var rsa = new RsaAlgorythm(0, 0);
+            var rsa = new RsaAlgorithm(0, 0);
             var a = new BigInteger(3);
             var b = new BigInteger(9167368);
             var eulerValue = rsa.CalculateEulerFunction(rsa.PValue, rsa.QValue);
@@ -54,21 +54,21 @@ namespace RSA.Tests
             
             var res = rsa.UseExtendedEuclid(eValue, eulerValue);
 
-            Assert.Equal( eValue*res % eulerValue, 1);
+            Assert.Equal( 1, eValue*res % eulerValue);
         }
 
         [Fact]
         public void EncryptTest()
         {
-            var rsa = new RsaAlgorythm(3557, 2579);
+            var rsa = new RsaAlgorithm(3557, 2579);
         }
 
         [Fact]
         public void ModuloMultiplication()
         {
-            var rsa = new RsaAlgorythm(2, 3);
+            var rsa = new RsaAlgorithm(2, 3);
             var resul = rsa.ModularMultiplication(175, 235, 257);
-            Assert.Equal(resul, 3);
+            Assert.Equal(3, resul);
         }
     }
 }

@@ -6,30 +6,66 @@ using System.Threading.Tasks;
 using SupeRSAfe.BLL.Interfaces;
 using SupeRSAfe.DAL.Interfaces;
 using SupeRSAfe.DTO.Manage;
+using Microsoft.AspNetCore.Identity;
+using SupeRSAfe.DAL.Entities;
 
 namespace SupeRSAfe.BLL.Services
 {
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public Task<bool> CreateNewUser(RegisterViewModel registerViewModel)
+        private readonly SignInManager<User> _signInManager;
+
+        public UserService(IUnitOfWork unitOfWork, SignInManager<User> signInManager)
         {
-            throw new NotImplementedException();
+            this._unitOfWork = unitOfWork;
+            this._signInManager = signInManager;
+        }
+        public async Task<bool> CreateNewUser(RegisterViewModel registerViewModel)
+        {
+            var newUser = new User
+            {
+                Email = registerViewModel.Email,
+                UserName = registerViewModel.Username,
+            };
+
+            var result = await _unitOfWork.UserManager.CreateAsync(newUser, registerViewModel.Password);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(newUser, false);
+            }
+            return result.Succeeded;
         }
 
-        public Task<bool> DoesEmailExists(string email)
+        public async Task<bool> DoesEmailExists(string email)
         {
-            throw new NotImplementedException();
+            bool doesEmailExists = false;
+            var user = await _unitOfWork.UserManager.FindByEmailAsync(email);
+            if(user != null)
+            {
+                doesEmailExists = true;
+            }
+            return doesEmailExists;
         }
 
-        public Task<bool> LogIn(LoginViewModel loginViewModel)
+        public async Task<bool> LogIn(LoginViewModel loginViewModel)
         {
-            throw new NotImplementedException();
+            var result = await
+              _signInManager.PasswordSignInAsync(loginViewModel.Username, loginViewModel.Password, false, false);
+
+            return result.Succeeded ? true : false;
         }
 
-        public void LogOut()
+        public async void LogOut()
         {
-            throw new NotImplementedException();
+            await _signInManager.SignOutAsync();
+        }
+
+        public async Task<User> GetUser(string email)
+        {
+            var user = await _unitOfWork.UserManager.FindByEmailAsync(email);
+            return user == null ? new User() : user;
         }
     }
 }

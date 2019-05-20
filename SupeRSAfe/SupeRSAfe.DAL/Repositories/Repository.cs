@@ -10,9 +10,7 @@ namespace SupeRSAfe.DAL.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private MailDbContext _dbContext;
-
-        public Repository() { }
+        private readonly MailDbContext _dbContext;
 
         public Repository( MailDbContext dbContext)
         {
@@ -30,7 +28,7 @@ namespace SupeRSAfe.DAL.Repositories
 
         public async void Create(T item)
         {
-            await _dbContext.Set<T>().AddAsync(item);
+            All.Append(item);
         }
 
         public void Delete(T item)

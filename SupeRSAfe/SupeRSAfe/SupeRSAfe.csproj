@@ -9,9 +9,24 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.1.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\RSA\RSA.csproj" />
+    <ProjectReference Include="..\SupeRSAfe.BLL\SupeRSAfe.BLL.csproj" />
+    <ProjectReference Include="..\SupeRSAfe.DAL\SupeRSAfe.DAL.csproj" />
+    <ProjectReference Include="..\SupeRSAfe.DTO\SupeRSAfe.DTO.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Areas\" />
   </ItemGroup>
 
 </Project>

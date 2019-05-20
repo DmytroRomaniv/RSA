@@ -17,7 +17,7 @@ namespace SupeRSAfe.DAL.Context
 
         public MailDbContext(DbContextOptions<MailDbContext> dbContextOptions): base(dbContextOptions)
         {
-            Database.EnsureCreatedAsync();
+            Database.EnsureCreated();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SupeRSAfe.DAL.Entities;
 
 namespace SupeRSAfe.DTO.Models
 {
@@ -8,9 +9,11 @@ namespace SupeRSAfe.DTO.Models
     {
         public int Id { get; set; }
 
-        public string Sender { get; set; }
+        public User Sender { get; set; }
 
-        public string Receiver { get; set; }
+        public User Receiver { get; set; }
+
+        public string Subject { get; set; }
 
         public string Message { get; set; }
 

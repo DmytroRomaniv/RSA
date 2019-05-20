@@ -10,9 +10,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SupeRSAfe.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using SupeRSAfe.DAL.Context;
+using SupeRSAfe.DAL.Entities;
+using SupeRSAfe.DAL.Interfaces;
+using SupeRSAfe.DAL;
+using SupeRSAfe.BLL.Interfaces;
+using SupeRSAfe.BLL.Services;
+using AutoMapper;
 
 namespace SupeRSAfe
 {
@@ -35,14 +42,33 @@ namespace SupeRSAfe
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<MailDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<MailDbContext>();
 
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUserService, UserService>();
+            
+            services.AddAutoMapper();
+
+            services.AddMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+            services.AddSession();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,8 +96,10 @@ namespace SupeRSAfe
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Authorization}/{action=Login}");
             });
+
+            app.UseCookiePolicy();
         }
     }
 }
