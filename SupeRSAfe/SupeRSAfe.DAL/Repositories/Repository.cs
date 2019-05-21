@@ -22,13 +22,13 @@ namespace SupeRSAfe.DAL.Repositories
             get
             {
                 var collection = _dbContext.Set<T>();
-                return collection;
+                return collection.ToList();
             }
         }
 
         public async void Create(T item)
         {
-            All.Append(item);
+            await _dbContext.Set<T>().AddAsync(item);
         }
 
         public void Delete(T item)

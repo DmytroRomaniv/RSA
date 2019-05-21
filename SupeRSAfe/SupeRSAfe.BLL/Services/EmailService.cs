@@ -8,7 +8,6 @@ using SupeRSAfe.BLL.Interfaces;
 using SupeRSAfe.DAL.Entities;
 using SupeRSAfe.DAL.Interfaces;
 using SupeRSAfe.DTO.Models;
-using RSA.Interfaces;
 using RSA;
 using System.Threading.Tasks;
 
@@ -40,8 +39,8 @@ namespace SupeRSAfe.BLL.Services
             key = new Key
             {
                 SecretKey = _encryptionAlgorithm.SecretKey.ToString(),
-                OpenKey = _encryptionAlgorithm.SecretKey.ToString(),
-                User = user
+                OpenKey = _encryptionAlgorithm.PublicKey.ToString(),
+                UserId = emailDTO.Receiver.Id,
             };
             var email = _mapper.Map<Email>(emailDTO);
             _unitOfWork.EmailRepository.Create(email);
@@ -76,10 +75,10 @@ namespace SupeRSAfe.BLL.Services
 
         public IEnumerable<EmailDTO> GetAll(User user)
         {
-            var emails = _unitOfWork.EmailRepository.All.Where(em => em.Receiver.Email == user.Email);
+            var emails = _unitOfWork.EmailRepository.All.Where(em => em.ReceiverId == user.Id).ToList();
             var emailDTOs = new List<EmailDTO>();
 
-            if (emails != null)
+            if (emails != null && emails.Count() > 0)
             {
                 emails.ToList().ForEach(em =>
                 {
@@ -97,20 +96,27 @@ namespace SupeRSAfe.BLL.Services
             if (emailDTO == null || keyDTO == null)
                 return new EmailDTO();
 
-            _encryptionAlgorithm = new RsaAlgorithm(2, 3);
-            _encryptionAlgorithm.PublicKey = keyDTO.OpenKey;
-            _encryptionAlgorithm.SecretKey = keyDTO.SecretKey;
+            if (BigInteger.TryParse(keyDTO.OpenKey, out var openKey) && BigInteger.TryParse(keyDTO.SecretKey, out var secretKey))
+            {
 
-            var byteMessage = await _encryptionAlgorithm.Decrypt(emailDTO.Message);
+                _encryptionAlgorithm = new RsaAlgorithm(2, 3);
+                _encryptionAlgorithm.PublicKey = openKey;
+                _encryptionAlgorithm.SecretKey = secretKey;
 
-            emailDTO.Message = ConvertToCharacters(byteMessage);
 
+                var numberOfSymboldInFirstCharacter = int.Parse(emailDTO.Message.Take(1).FirstOrDefault().ToString());
+                emailDTO.Message = emailDTO.Message.Substring(1);
+
+                var byteMessage = await _encryptionAlgorithm.Decrypt(emailDTO.Message);
+                
+                emailDTO.Message = ConvertToCharacters(byteMessage, numberOfSymboldInFirstCharacter);
+            }
             return emailDTO;
         }
 
         public IEnumerable<KeyDTO> GetAllKeys(User user)
         {
-            var keyCollection = _unitOfWork.KeyRepository.All.Where(k => k.User.Email == user.Email);
+            var keyCollection = _unitOfWork.KeyRepository.All.Where(em => em.UserId == user.Id).ToList();
             var keyDTOCollection = new List<KeyDTO>();
 
             foreach (var key in keyCollection)
@@ -135,7 +141,7 @@ namespace SupeRSAfe.BLL.Services
             return byteString.ToString();
         }
 
-        private string ConvertToCharacters(string message)
+        private string ConvertToCharacters(string message,int numberOfFirstSymbols)
         {
             var messageString = new StringBuilder();
             var byteCharacters = new List<string>();
@@ -143,14 +149,14 @@ namespace SupeRSAfe.BLL.Services
 
             while (index < message.Length - 2)
             {
-                var byteCharacter = message.Substring(index, 3);
+                string byteCharacter = index == 0 ? message.Substring(index, numberOfFirstSymbols) : message.Substring(index, 3);
                 byteCharacters.Add(byteCharacter);
 
-                index = (index + 1) * 3;
+                index = index == 0 ? index + numberOfFirstSymbols : index + 3;
             }
 
-
-            foreach (var character in byteCharacters)
+            byteCharacters = byteCharacters.Where(e => e != "000").ToList();
+            foreach (string character in byteCharacters)
             {
                 if (byte.TryParse(character, out var byteValue))
                 {

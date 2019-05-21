@@ -55,9 +55,9 @@ namespace SupeRSAfe.DAL
             UserManager = userManager;
         }
 
-        public async void Save()
+        public void Save()
         {
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace RSA.Tests
             var rsa = new RsaAlgorithm();
             var message = "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
             var encrMessage = await rsa.Encrypt(message);
-            var decMessage = await rsa.Decrypt(encrMessage);
+            var decMessage = await rsa.Decrypt(encrMessage.Substring(1));
             Assert.Contains(message, decMessage);
         }
 

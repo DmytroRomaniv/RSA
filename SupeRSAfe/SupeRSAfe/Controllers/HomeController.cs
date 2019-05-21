@@ -10,6 +10,8 @@ using SupeRSAfe.DTO.Models;
 using SupeRSAfe.Models;
 using System.Security.Claims;
 using SupeRSAfe.DAL.Entities;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Newtonsoft.Json;
 
 namespace SupeRSAfe.Controllers
 {
@@ -44,23 +46,26 @@ namespace SupeRSAfe.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Index(EmailDTO chosenEmail = null, KeyDTO choosenKey = null)
+        public async Task<IActionResult> Index()
         {
+            var name = User.Identity.Name;
             var user = await _userService.GetUser(User.Identity.Name);
             var emails = _emailService.GetAll(user);
+            var chosenEmail = TempData.Get<EmailDTO>("chosenEmail");
+            var chosenKey = TempData.Get<KeyDTO>("chosenKey");
 
             var keys = _emailService.GetAllKeys(user);
 
-            if(chosenEmail != null && choosenKey != null)
+            if(chosenEmail != null && chosenKey != null)
             {
-                chosenEmail = await _emailService.DecryptEmail(chosenEmail, choosenKey);
+                chosenEmail = await _emailService.DecryptEmail(chosenEmail, chosenKey);
             }
 
             var model = new MainViewModel
             {
                 Emails = emails,
                 Keys = keys,
-                ChoosenKey = choosenKey,
+                ChoosenKey = chosenKey,
                 ChosenEmail = chosenEmail,
             };
 
@@ -88,9 +93,43 @@ namespace SupeRSAfe.Controllers
                 Message = viewModel.Message,
                 Receiver = receiver,
                 Sender = user,
+                Subject = viewModel.Subject
             };
 
             return emailDTO;
+        }
+
+        public async Task<IActionResult> ChoseEmail(int id)
+        {
+            var user = await _userService.GetUser(User.Identity.Name);
+            var email = _emailService.GetAll(user).Where(m => id == m.Id).FirstOrDefault();
+
+            TempData.Put("chosenEmail", email);
+            return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> ChoseKey(int id)
+        {
+            var user = await _userService.GetUser(User.Identity.Name);
+            var key = _emailService.GetAllKeys(user).Where(k => id == k.Id).FirstOrDefault();
+
+            TempData.Put("chosenKey", key);
+            return RedirectToAction("Index", "Home");
+        }
+    }
+
+    public static class TempDataExtensions
+    {
+        public static void Put<T>(this ITempDataDictionary tempData, string key, T value) where T : class
+        {
+            tempData[key] = JsonConvert.SerializeObject(value);
+        }
+
+        public static T Get<T>(this ITempDataDictionary tempData, string key) where T : class
+        {
+            object o;
+            tempData.TryGetValue(key, out o);
+            return o == null ? null : JsonConvert.DeserializeObject<T>((string)o);
         }
     }
 }

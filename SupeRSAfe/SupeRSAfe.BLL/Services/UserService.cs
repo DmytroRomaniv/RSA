@@ -64,7 +64,7 @@ namespace SupeRSAfe.BLL.Services
 
         public async Task<User> GetUser(string email)
         {
-            var user = await _unitOfWork.UserManager.FindByEmailAsync(email);
+            var user = await _unitOfWork.UserManager.FindByNameAsync(email);
             return user == null ? new User() : user;
         }
     }

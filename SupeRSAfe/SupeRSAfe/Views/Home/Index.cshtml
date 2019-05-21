@@ -1,6 +1,8 @@
 ﻿@model SupeRSAfe.DTO.Manage.MainViewModel
 @{
     ViewData["Title"] = "Home Page";
+
+    TempData.Keep();
 }
 
 <div class="container-fluid">
@@ -11,7 +13,9 @@
                 <ul>
                     @foreach (var email in Model.Emails)
                     {
+                    <a asp-action="ChoseEmail" asp-controller="Home" asp-route-id="@email.Id">
                         <li>@email.Date   @email.Subject</li>
+                    </a>
                     }
                 </ul>
             }
@@ -36,7 +40,9 @@
                 <ul>
                     @foreach (var key in Model.Keys)
                     {
-                        <li>@key.OpenKey</li>
+                    <a asp-action="ChoseKey" asp-controller="Home" asp-route-id="@key.Id">
+                        <li>Public key: <br />@key.OpenKey</li>
+                    </a>
                     }
                 </ul>
             }

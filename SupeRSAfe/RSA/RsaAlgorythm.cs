@@ -68,6 +68,7 @@ namespace RSA
                 var secondSecretKey = UseExtendedEuclid(SecretKey, eulerValue);
                 var messageLength = PublicKey.ToString().Length;
                 var dividedMessage = DivideMessage(message, messageLength);
+                var firstSymbolLenght = CountFirstCharacterNumberOfSymbols(message);
                 var encodedMessages = new List<string>();
 
                 foreach (var subMessage in dividedMessage)
@@ -85,7 +86,7 @@ namespace RSA
                     }
                 }
 
-                result = ConvertToString(encodedMessages);
+                result = firstSymbolLenght + ConvertToString(encodedMessages); 
             });
 
             return result;
@@ -348,6 +349,12 @@ namespace RSA
             }
 
             return xn;
+        }
+
+        private int CountFirstCharacterNumberOfSymbols(string message)
+        {
+            var numberOfZeros = message.TakeWhile(c => c == '0').Count();
+            return 3 - numberOfZeros;
         }
     }
 }

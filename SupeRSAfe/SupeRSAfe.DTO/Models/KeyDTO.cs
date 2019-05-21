@@ -4,12 +4,13 @@ using System.Text;
 
 namespace SupeRSAfe.DTO.Models
 {
+    [Serializable]
     public class KeyDTO
     {
         public int Id { get; set; }
 
-        public long SecretKey { get; set; }
+        public string SecretKey { get; set; }
 
-        public long OpenKey { get; set; }
+        public string OpenKey { get; set; }
     }
 }

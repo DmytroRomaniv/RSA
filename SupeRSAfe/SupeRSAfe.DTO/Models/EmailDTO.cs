@@ -5,6 +5,7 @@ using SupeRSAfe.DAL.Entities;
 
 namespace SupeRSAfe.DTO.Models
 {
+    [Serializable]
     public class EmailDTO
     {
         public int Id { get; set; }

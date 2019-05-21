@@ -48,6 +48,7 @@ namespace SupeRSAfe.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            TempData.Clear();
             return View();
         }
 
