@@ -10,11 +10,16 @@
         <div class="col-md-4 main">
             @if (Model.Emails != null)
             {
-                <ul>
+                <ul class="list-group">
                     @foreach (var email in Model.Emails)
                     {
                     <a asp-action="ChoseEmail" asp-controller="Home" asp-route-id="@email.Id">
-                        <li>@email.Date   @email.Subject</li>
+                        <li>
+                            <div class="col-sm-12">
+                                <h4>@email.Subject</h4>
+                                <p>@email.Date</p>
+                            </div>
+                        </li>
                     </a>
                     }
                 </ul>

@@ -19,6 +19,20 @@
                 <span asp-validation-for="Subject"></span>
             </div>
             <div>
+                <label asp-for="PValue"></label><br />
+                <input asp-for="PValue" class="form-control">
+                <span asp-validation-for="Subject"></span>
+            <div>
+                <label asp-for="QValue"></label><br />
+                <input asp-for="QValue" class="form-control">
+                <span asp-validation-for="QValue"></span>
+            </div>
+            <div>
+                <label asp-for="UseRandomValues"></label><br />
+                <input asp-for="UseRandomValues" class="form-control" type="checkbox">
+                <span asp-validation-for="UseRandomValues"></span>
+            </div>
+            <div>
                 <label asp-for="Message"></label><br />
                 <textarea rows="10" type="text" asp-for="Message" class="form-control"></textarea>
                 <span asp-validation-for="Message"></span>
@@ -27,6 +41,6 @@
             <div>
                 <button type="submit" class="btn btn-success">Send</button>
             </div>
-        </div>
+            </div>
     </div>
 </form>

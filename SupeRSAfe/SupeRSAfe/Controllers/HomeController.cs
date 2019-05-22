@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Numerics;
 using Microsoft.AspNetCore.Mvc;
 using SupeRSAfe.DTO.Manage;
 using SupeRSAfe.BLL.Interfaces;
@@ -12,9 +13,11 @@ using System.Security.Claims;
 using SupeRSAfe.DAL.Entities;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SupeRSAfe.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IEmailService _emailService;
@@ -41,8 +44,21 @@ namespace SupeRSAfe.Controllers
                 var emailDTO = await Convert(emailForm);
                 
                 var usr = _userService.GetUser(User.Identity.Name).Result;
-                _emailService.Create(emailDTO, usr);
+
+                if (emailForm.UseRandomValues)
+                {
+                    _emailService.Create(emailDTO, usr);
+                }
+                else if (CheckNumbersForPrime(emailForm))
+                {
+                    _emailService.Create(emailDTO, usr, emailForm.PValue, emailForm.QValue);
+                }
+                else
+                {
+                    return View(emailForm);
+                }
             }
+
             return RedirectToAction("Index");
         }
 
@@ -115,6 +131,27 @@ namespace SupeRSAfe.Controllers
 
             TempData.Put("chosenKey", key);
             return RedirectToAction("Index", "Home");
+        }
+
+        private bool CheckNumbersForPrime(EmailViewModel emailForm)
+        {
+            if(BigInteger.TryParse(emailForm.PValue, out var pValue) && BigInteger.TryParse(emailForm.QValue, out var qValue))
+            {
+                if(RSA.RsaAlgorithm.FermatsIsPrime(pValue) && RSA.RsaAlgorithm.FermatsIsPrime(qValue))
+                {
+                    return true;
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Q and P must be prime numbers");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "You must enter numbers for key generation.");
+            }
+
+            return false;
         }
     }
 

@@ -11,6 +11,8 @@ namespace SupeRSAfe.BLL.Interfaces
     {
         void Create(EmailDTO emailDTO, User user);
 
+        void Create(EmailDTO emailDTO, User user, string pValue, string qValue);
+
         void Delete(EmailDTO email);
 
         IEnumerable<EmailDTO> Find(string searchLine);

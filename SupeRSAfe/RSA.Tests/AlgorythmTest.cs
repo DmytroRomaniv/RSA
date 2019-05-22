@@ -10,10 +10,10 @@ namespace RSA.Tests
         [Fact]
         public async void SmallNumbersTest()
         {
-            var rsa = new RsaAlgorithm();
-            var message = "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+            var rsa = new RsaAlgorithm(3557, 2579);
+            var message = "104101108108111104101108108111104101108108111104101108108111104101108108111104101108108111110097109101110097109101110097110097110097110097110110097097";
             var encrMessage = await rsa.Encrypt(message);
-            var decMessage = await rsa.Decrypt(encrMessage.Substring(1));
+            var decMessage = await rsa.Decrypt(encrMessage);
             Assert.Contains(message, decMessage);
         }
 
@@ -24,7 +24,7 @@ namespace RSA.Tests
             var rsa = new RsaAlgorithm(2, 3);
             var prime = rsa.GenerateRandomPrimeInteger(long.MaxValue);
 
-            Assert.True(rsa.FermatsIsPrime(prime));
+            Assert.True(RsaAlgorithm.FermatsIsPrime(prime));
         }
         [Fact]
         public void CoprimeSmallNumbersTest()
@@ -58,16 +58,21 @@ namespace RSA.Tests
         }
 
         [Fact]
-        public void EncryptTest()
+        public async void EncryptTest()
         {
             var rsa = new RsaAlgorithm(3557, 2579);
+            var byteMessage = "104101108108111104101108108111104101108108111104101108108111104101108108111104101108108111110097109101110097109101110097110097110097110097110110097097";
+            var message = await rsa.Encrypt(byteMessage);
+            var decMessage = await rsa.Decrypt(message);
+
+            Assert.Contains(byteMessage, decMessage);
         }
 
         [Fact]
         public void ModuloMultiplication()
         {
             var rsa = new RsaAlgorithm(2, 3);
-            var resul = rsa.ModularMultiplication(175, 235, 257);
+            var resul = RsaAlgorithm.ModularMultiplication(175, 235, 257);
             Assert.Equal(3, resul);
         }
     }

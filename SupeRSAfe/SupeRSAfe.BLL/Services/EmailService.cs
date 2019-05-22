@@ -17,7 +17,6 @@ namespace SupeRSAfe.BLL.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private RsaAlgorithm _encryptionAlgorithm;
 
         public EmailService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -29,23 +28,25 @@ namespace SupeRSAfe.BLL.Services
         {
             if (emailDTO == null || user == null)
                 return;
+            var encryptionAlgorithm = new RsaAlgorithm();
 
-            Key key;
-            _encryptionAlgorithm = new RsaAlgorithm();
-            var byteMessage = ConvertToByteString(emailDTO.Message.Replace("\n", ""));
+            CreateAndSaveEmail(emailDTO, user, encryptionAlgorithm);
+        }
 
-            emailDTO.Message = _encryptionAlgorithm.Encrypt(byteMessage).Result;
+        public void Create(EmailDTO emailDTO, User user, string pValue, string qValue)
+        {
+            if (emailDTO == null || user == null)
+                return;
 
-            key = new Key
+            if (BigInteger.TryParse(pValue, out var pIntegerValue) && BigInteger.TryParse(qValue, out var qIntegerValue))
             {
-                SecretKey = _encryptionAlgorithm.SecretKey.ToString(),
-                OpenKey = _encryptionAlgorithm.PublicKey.ToString(),
-                UserId = emailDTO.Receiver.Id,
-            };
-            var email = _mapper.Map<Email>(emailDTO);
-            _unitOfWork.EmailRepository.Create(email);
-            _unitOfWork.KeyRepository.Create(key);
-            _unitOfWork.Save();
+                var encryptionAlgorithm = new RsaAlgorithm(pIntegerValue, qIntegerValue);
+                CreateAndSaveEmail(emailDTO, user, encryptionAlgorithm);
+            }
+            else
+            {
+                Create(emailDTO, user);
+            }
         }
 
         public void Delete(EmailDTO emailDTO)
@@ -99,17 +100,13 @@ namespace SupeRSAfe.BLL.Services
             if (BigInteger.TryParse(keyDTO.OpenKey, out var openKey) && BigInteger.TryParse(keyDTO.SecretKey, out var secretKey))
             {
 
-                _encryptionAlgorithm = new RsaAlgorithm(2, 3);
-                _encryptionAlgorithm.PublicKey = openKey;
-                _encryptionAlgorithm.SecretKey = secretKey;
+                var encryptionAlgorithm = new RsaAlgorithm(2, 3);
+                encryptionAlgorithm.PublicKey = openKey;
+                encryptionAlgorithm.SecretKey = secretKey;
 
-
-                var numberOfSymboldInFirstCharacter = int.Parse(emailDTO.Message.Take(1).FirstOrDefault().ToString());
-                emailDTO.Message = emailDTO.Message.Substring(1);
-
-                var byteMessage = await _encryptionAlgorithm.Decrypt(emailDTO.Message);
+                var byteMessage = await encryptionAlgorithm.Decrypt(emailDTO.Message);
                 
-                emailDTO.Message = ConvertToCharacters(byteMessage, numberOfSymboldInFirstCharacter);
+                emailDTO.Message = ConvertToCharacters(byteMessage);
             }
             return emailDTO;
         }
@@ -141,7 +138,7 @@ namespace SupeRSAfe.BLL.Services
             return byteString.ToString();
         }
 
-        private string ConvertToCharacters(string message,int numberOfFirstSymbols)
+        private string ConvertToCharacters(string message)
         {
             var messageString = new StringBuilder();
             var byteCharacters = new List<string>();
@@ -149,10 +146,10 @@ namespace SupeRSAfe.BLL.Services
 
             while (index < message.Length - 2)
             {
-                string byteCharacter = index == 0 ? message.Substring(index, numberOfFirstSymbols) : message.Substring(index, 3);
+                string byteCharacter = message.Substring(index, 3);
                 byteCharacters.Add(byteCharacter);
 
-                index = index == 0 ? index + numberOfFirstSymbols : index + 3;
+                index += 3;
             }
 
             byteCharacters = byteCharacters.Where(e => e != "000").ToList();
@@ -171,6 +168,25 @@ namespace SupeRSAfe.BLL.Services
             }
 
             return messageString.ToString();
+        }
+
+        private void CreateAndSaveEmail(EmailDTO emailDTO, User user, RsaAlgorithm rsaAlgorithm) 
+        {
+            Key key;
+            var byteMessage = ConvertToByteString(emailDTO.Message.Replace("\n", " "));
+
+            emailDTO.Message = rsaAlgorithm.Encrypt(byteMessage).Result;
+
+            key = new Key
+            {
+                SecretKey = rsaAlgorithm.SecretKey.ToString(),
+                OpenKey = rsaAlgorithm.PublicKey.ToString(),
+                UserId = emailDTO.Receiver.Id,
+            };
+            var email = _mapper.Map<Email>(emailDTO);
+            _unitOfWork.EmailRepository.Create(email);
+            _unitOfWork.KeyRepository.Create(key);
+            _unitOfWork.Save();
         }
     }
 }

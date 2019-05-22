@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RSA
 {
     public class RsaAlgorithm : IEncryptionAlgorithm
-    { 
+    {
         public BigInteger PValue;
         public BigInteger QValue;
         public BigInteger SecretKey { get; set; }
@@ -31,15 +31,15 @@ namespace RSA
             }
         }
 
-        public RsaAlgorithm(BigInteger nValue, BigInteger qValue)
+        public RsaAlgorithm(BigInteger pValue, BigInteger qValue)
         {
-            if (nValue <= 0 || !FermatsIsPrime(nValue))
+            if (pValue <= 0 || !FermatsIsPrime(pValue))
             {
                 PValue = GenerateRandomPrimeInteger();
             }
             else
             {
-                PValue = nValue;
+                PValue = pValue;
             }
 
             if (qValue <= 0 || !FermatsIsPrime(qValue))
@@ -66,9 +66,8 @@ namespace RSA
                 var eulerValue = CalculateEulerFunction(PValue, QValue);
                 SecretKey = GenerateCoprimeInteger(eulerValue);
                 var secondSecretKey = UseExtendedEuclid(SecretKey, eulerValue);
-                var messageLength = PublicKey.ToString().Length;
+                var messageLength = PublicKey.ToString().Length / 3 * 3;
                 var dividedMessage = DivideMessage(message, messageLength);
-                var firstSymbolLenght = CountFirstCharacterNumberOfSymbols(message);
                 var encodedMessages = new List<string>();
 
                 foreach (var subMessage in dividedMessage)
@@ -76,17 +75,18 @@ namespace RSA
                     string partMessage = subMessage;
                     if (partMessage.Length < messageLength)
                     {
-                        partMessage = partMessage.PadRight(PublicKey.ToString().Length - 1, '0');
+                        partMessage = partMessage.PadRight(messageLength, '0');
                     }
 
                     if (BigInteger.TryParse(partMessage, out var big))
                     {
                         var encodedMessage = ModularMultiplication(big, secondSecretKey, PublicKey);
-                        encodedMessages.Add(encodedMessage.ToString());
+                        var encodedMessageLength = encodedMessage.ToString().Length.ToString("D2");
+                        encodedMessages.Add(encodedMessageLength + encodedMessage.ToString());
                     }
                 }
 
-                result = firstSymbolLenght + ConvertToString(encodedMessages); 
+                result = ConvertToString(encodedMessages);
             });
 
             return result;
@@ -104,22 +104,21 @@ namespace RSA
         public async Task<string> Decrypt(string encryptedMessage)
         {
             string result = string.Empty;
-
             if (PublicKey != null && PublicKey > 1 && SecretKey != null && SecretKey > 1)
             {
                 await Task.Run(() =>
                 {
-                    var messageLength = PublicKey.ToString().Length;
-                    var dividedMessage = DivideMessage(encryptedMessage, messageLength);
-
+                    var dividedMessage = DivideMessage(encryptedMessage);
                     var decryptedMessages = new List<string>();
+                    var messageLength = PublicKey.ToString().Length / 3 * 3;
 
                     foreach (var subString in dividedMessage)
                     {
                         if (!BigInteger.TryParse(subString, out var big))
                             continue;
                         var decryptedMessage = ModularMultiplication(big, SecretKey, PublicKey);
-                        decryptedMessages.Add(decryptedMessage.ToString());
+                        var filledMessage = decryptedMessage.ToString().PadLeft(messageLength, '0');
+                        decryptedMessages.Add(filledMessage);
                     }
 
                     result = ConvertToString(decryptedMessages);
@@ -139,7 +138,37 @@ namespace RSA
             {
                 var start = i * lenght;
                 string subMessage = start + lenght < message.Length ? message.Substring(start, lenght) : message.Substring(start);
+                if(BigInteger.TryParse(subMessage, out var value) && value >= PublicKey)
+                {
+                    subMessage = subMessage.Remove(subMessage.Length - 1);
+                    index--;
+                }
+
                 dividedMessage.Add(subMessage);
+            }
+
+            return dividedMessage;
+        }
+
+        private IEnumerable<string> DivideMessage(string message)
+        {
+            var dividedMessage = new List<string>();
+            var index = 0;
+            while (index < message.Length)
+            {
+                var numberOfSymbols = message.ElementAt(index) + message.ElementAt(index + 1).ToString();
+                if (int.TryParse(numberOfSymbols, out var subMessageLength))
+                {
+                    index += 2;
+                    string subMessage = index + subMessageLength < message.Length ? message.Substring(index, subMessageLength) : message.Substring(index);
+                    dividedMessage.Add(subMessage);
+
+                    index += subMessageLength;
+                }
+                else
+                {
+                    break;
+                }
             }
 
             return dividedMessage;
@@ -157,7 +186,7 @@ namespace RSA
             return returnMessage.ToString();
         }
 
-        public bool FermatsIsPrime(BigInteger value, int numberOfTests = 128)
+        public static bool FermatsIsPrime(BigInteger value, int numberOfTests = 128)
         {
             if (value == 2 || value == 3)
             {
@@ -170,7 +199,7 @@ namespace RSA
 
             var range = (long)value - 1;
             var strongPrimes = new[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 183, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 461, 1215, 34862, 379215 };
-            var strongPrimesArray = new[] { 2, 3, 5, 7, 11, 13, 17 };
+            var strongPrimesArray = FindStrongPrimeBases(value);
 
             if (!FindSanD(range, out var s, out var d))
                 return false;
@@ -181,6 +210,7 @@ namespace RSA
                 if (BigInteger.Abs(checkResult) == 1)
                     continue;
 
+                strongPrimes = strongPrimes.Where(el => el < value).ToArray();
                 foreach (var probableStrongPrime in strongPrimes)
                 {
                     var firstCheck = ModularMultiplication(strongPrime, range, value);
@@ -193,7 +223,7 @@ namespace RSA
 
                 for (int i = 0; i < numberOfTests; i++)
                 {
-                    var r = LongRandom(2, value, _random);
+                    var r = LongRandom(2, value);
                     if (BigInteger.Abs(ModularMultiplication((long)Math.Pow(strongPrime, d), (long)Math.Pow(2, (double)r), value)) == 1)
                     {
                         return false;
@@ -201,6 +231,33 @@ namespace RSA
                 }
             }
             return true;
+        }
+
+        private static int[] FindStrongPrimeBases(BigInteger value)
+        {
+            var strongPrimesArray = new List<int> { 2, 3};
+            if(value > 1373652)
+            {
+                strongPrimesArray.Add(5);
+            }
+            if(value > 2532600)
+            {
+                strongPrimesArray.Add(7);
+            }
+            if(value > 2152302898747)
+            {
+                strongPrimesArray.Add(11);
+            }
+            if(value > 3474749660383)
+            {
+                strongPrimesArray.Add(13);
+            }
+            if(value > 341550071728321)
+            {
+                strongPrimesArray.Add(17);
+            }
+
+            return strongPrimesArray.ToArray();
         }
 
         private static bool FindSanD(long range, out long s, out double d)
@@ -216,7 +273,7 @@ namespace RSA
             return d >= 3;
         }
 
-        public BigInteger ModularMultiplication(BigInteger value, BigInteger powerValue, BigInteger modularValue)
+        public static BigInteger ModularMultiplication(BigInteger value, BigInteger powerValue, BigInteger modularValue)
         {
             BigInteger result;
             var binaryPowerValue = powerValue.ToBinaryString().Reverse();
@@ -246,12 +303,12 @@ namespace RSA
 
         public BigInteger GenerateRandomInteger(BigInteger max)
         {
-            var randomInteger = LongRandom(2, max, _random);
+            var randomInteger = LongRandom(2, max);
 
             return randomInteger;
         }
 
-        private BigInteger LongRandom(BigInteger min, BigInteger max, Random rand)
+        private static BigInteger LongRandom(BigInteger min, BigInteger max)
         {
             var rNgCryptoServiceProvider = new RNGCryptoServiceProvider();
             var buf = new byte[64];
@@ -349,12 +406,6 @@ namespace RSA
             }
 
             return xn;
-        }
-
-        private int CountFirstCharacterNumberOfSymbols(string message)
-        {
-            var numberOfZeros = message.TakeWhile(c => c == '0').Count();
-            return 3 - numberOfZeros;
         }
     }
 }
