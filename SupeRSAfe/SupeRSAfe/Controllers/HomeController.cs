@@ -108,7 +108,6 @@ namespace SupeRSAfe.Controllers
                 Date = DateTime.Now,
                 Message = viewModel.Message,
                 Receiver = receiver,
-                Sender = user,
                 Subject = viewModel.Subject
             };
 
@@ -117,8 +116,12 @@ namespace SupeRSAfe.Controllers
 
         public async Task<IActionResult> ChoseEmail(int id)
         {
-            var user = await _userService.GetUser(User.Identity.Name);
-            var email = _emailService.GetAll(user).Where(m => id == m.Id).FirstOrDefault();
+            EmailDTO email = null;
+            if (id > 0)
+            {
+                var user = await _userService.GetUser(User.Identity.Name);
+                email = _emailService.GetAll(user).Where(m => id == m.Id).FirstOrDefault();
+            }
 
             TempData.Put("chosenEmail", email);
             return RedirectToAction("Index", "Home");
@@ -126,8 +129,12 @@ namespace SupeRSAfe.Controllers
 
         public async Task<IActionResult> ChoseKey(int id)
         {
-            var user = await _userService.GetUser(User.Identity.Name);
-            var key = _emailService.GetAllKeys(user).Where(k => id == k.Id).FirstOrDefault();
+            KeyDTO key = null;
+            if (id > 0)
+            { 
+                var user = await _userService.GetUser(User.Identity.Name);
+                key = _emailService.GetAllKeys(user).Where(k => id == k.Id).FirstOrDefault();
+            }
 
             TempData.Put("chosenKey", key);
             return RedirectToAction("Index", "Home");

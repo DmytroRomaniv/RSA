@@ -20,6 +20,10 @@ namespace SupeRSAfe.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            if (User != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -49,6 +53,11 @@ namespace SupeRSAfe.Controllers
         public IActionResult Login()
         {
             TempData.Clear();
+            if(User!= null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 

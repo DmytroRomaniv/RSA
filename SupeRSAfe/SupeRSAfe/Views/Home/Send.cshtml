@@ -27,14 +27,14 @@
                 <input asp-for="QValue" class="form-control">
                 <span asp-validation-for="QValue"></span>
             </div>
-            <div>
-                <label asp-for="UseRandomValues"></label><br />
-                <input asp-for="UseRandomValues" class="form-control" type="checkbox">
+            <div class="form-check">
+                <input asp-for="UseRandomValues" class="form-check-input" type="checkbox" checked>
+                <label asp-for="UseRandomValues" class="form-check-label"></label>
                 <span asp-validation-for="UseRandomValues"></span>
             </div>
             <div>
                 <label asp-for="Message"></label><br />
-                <textarea rows="10" type="text" asp-for="Message" class="form-control"></textarea>
+                <textarea rows="9" type="text" asp-for="Message" class="form-control"></textarea>
                 <span asp-validation-for="Message"></span>
             </div>
             <br />
