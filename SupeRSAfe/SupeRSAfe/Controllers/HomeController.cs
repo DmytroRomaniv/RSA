@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Numerics;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.AspNetCore.Mvc;
 using SupeRSAfe.DTO.Manage;
 using SupeRSAfe.BLL.Interfaces;
 using SupeRSAfe.DTO.Models;
 using SupeRSAfe.Models;
 using System.Security.Claims;
+using System.Web;
 using SupeRSAfe.DAL.Entities;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
@@ -22,6 +26,7 @@ namespace SupeRSAfe.Controllers
     {
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
+        private KeyDTO key;
         public HomeController(IEmailService emailService, IUserService userService)
         {
             _emailService = emailService;
@@ -37,8 +42,10 @@ namespace SupeRSAfe.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Send(EmailViewModel emailForm)
+        public async Task<FileResult> Send(EmailViewModel emailForm)
         {
+            var fileBytes = new byte[]{};
+            var fileName = $"Key_{emailForm.Subject}.rsa";
             if (ModelState.IsValid)
             {
                 var emailDTO = await Convert(emailForm);
@@ -47,21 +54,18 @@ namespace SupeRSAfe.Controllers
 
                 if (emailForm.UseRandomValues)
                 {
-                    _emailService.Create(emailDTO, usr);
+                    fileBytes = _emailService.Create(emailDTO, usr);
                 }
                 else if (CheckNumbersForPrime(emailForm))
                 {
-                    _emailService.Create(emailDTO, usr, emailForm.PValue, emailForm.QValue);
-                }
-                else
-                {
-                    return View(emailForm);
+                    fileBytes = _emailService.Create(emailDTO, usr, emailForm.PValue, emailForm.QValue);
                 }
             }
 
-            return RedirectToAction("Index");
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var name = User.Identity.Name;
@@ -86,6 +90,18 @@ namespace SupeRSAfe.Controllers
             };
 
             return View(model);
+        }
+        
+        [HttpPost]
+        public ActionResult Index(MainViewModel Model)
+        {
+            if (Model.File != null)
+            {
+                IFormatter br = new BinaryFormatter();
+                key = (KeyDTO) br.Deserialize(Model.File.InputStream);
+            }
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()

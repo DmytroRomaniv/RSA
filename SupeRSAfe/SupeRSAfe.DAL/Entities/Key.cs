@@ -5,6 +5,7 @@ using System.Text;
 
 namespace SupeRSAfe.DAL.Entities
 {
+    [Serializable]
     public class Key
     {
         public int Id { get; set; }

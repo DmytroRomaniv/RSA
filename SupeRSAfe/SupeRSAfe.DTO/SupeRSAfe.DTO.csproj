@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -6,6 +6,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SupeRSAfe.DAL\SupeRSAfe.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mvc2" Version="2.0.1" />
   </ItemGroup>
 
 </Project>

@@ -4,26 +4,39 @@
 }
 
 <form method="post" asp-controller="Home" asp-action="Send">
-    <div class="form-group row">
-        <div class="col-sm-12">
-            <h1>Send</h1>
-            <div asp-validation-summary="ModelOnly"></div>
-            <div class="form-group">
-                <label asp-for="Receiver"></label><br />
-                <input asp-for="Receiver" class="form-control" />
-                <span asp-validation-for="Receiver"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Subject"></label><br />
-                <input asp-for="Subject" class="form-control" />
-                <span asp-validation-for="Subject"></span>
-            </div>
+    <div class="form-group row"/>
+    <div class="col-sm-12">
+        <h1>Send</h1>
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="form-group">
+            <label asp-for="Receiver"></label>
+            <br/>
+            <input asp-for="Receiver" class="form-control"/>
+            <span asp-validation-for="Receiver"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Subject"></label>
+            <br/>
+            <input asp-for="Subject" class="form-control"/>
+            <span asp-validation-for="Subject"></span>
+        </div>
+        <div>
+            <input type="radio"
+                   name="contact" value="md5">
+            <label for="contactChoice2">MD5</label>
+        </div>
+        <div>
+            <input type="radio" name="contact" value="sha1">
+                <label for="contactChoice2">SHA-1</label>
+        </div>
+        <div>
+            <label asp-for="PValue"></label>
+            <br/>
+            <input asp-for="PValue" class="form-control">
+            <span asp-validation-for="Subject"></span>
             <div>
-                <label asp-for="PValue"></label><br />
-                <input asp-for="PValue" class="form-control">
-                <span asp-validation-for="Subject"></span>
-            <div>
-                <label asp-for="QValue"></label><br />
+                <label asp-for="QValue"></label>
+                <br/>
                 <input asp-for="QValue" class="form-control">
                 <span asp-validation-for="QValue"></span>
             </div>
@@ -33,14 +46,15 @@
                 <span asp-validation-for="UseRandomValues"></span>
             </div>
             <div>
-                <label asp-for="Message"></label><br />
+                <label asp-for="Message"></label>
+                <br/>
                 <textarea rows="9" type="text" asp-for="Message" class="form-control"></textarea>
                 <span asp-validation-for="Message"></span>
             </div>
-            <br />
+            <br/>
             <div>
                 <button type="submit" class="btn btn-success">Send</button>
             </div>
-            </div>
+        </div>
     </div>
 </form>

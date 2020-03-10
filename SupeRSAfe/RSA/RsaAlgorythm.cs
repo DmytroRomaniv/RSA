@@ -59,7 +59,7 @@ namespace RSA
 
         public async Task<string> Encrypt(string message)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             await Task.Run(() =>
             {
                 PublicKey = PValue * QValue;
@@ -72,18 +72,15 @@ namespace RSA
 
                 foreach (var subMessage in dividedMessage)
                 {
-                    string partMessage = subMessage;
-                    if (partMessage.Length < messageLength)
-                    {
+                    var partMessage = subMessage;
+                    if (partMessage.Length < messageLength) 
                         partMessage = partMessage.PadRight(messageLength, '0');
-                    }
 
-                    if (BigInteger.TryParse(partMessage, out var big))
-                    {
-                        var encodedMessage = ModularMultiplication(big, secondSecretKey, PublicKey);
-                        var encodedMessageLength = encodedMessage.ToString().Length.ToString("D2");
-                        encodedMessages.Add(encodedMessageLength + encodedMessage.ToString());
-                    }
+                    if (!BigInteger.TryParse(partMessage, out var big)) 
+                        continue;
+                    var encodedMessage = ModularMultiplication(big, secondSecretKey, PublicKey);
+                    var encodedMessageLength = encodedMessage.ToString().Length.ToString("D2");
+                    encodedMessages.Add(encodedMessageLength + encodedMessage.ToString());
                 }
 
                 result = ConvertToString(encodedMessages);
@@ -103,7 +100,7 @@ namespace RSA
         }
         public async Task<string> Decrypt(string encryptedMessage)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             if (PublicKey != null && PublicKey > 1 && SecretKey != null && SecretKey > 1)
             {
                 await Task.Run(() =>
@@ -137,7 +134,7 @@ namespace RSA
             for (var i = 0; i <= index; i++)
             {
                 var start = i * lenght;
-                string subMessage = start + lenght < message.Length ? message.Substring(start, lenght) : message.Substring(start);
+                var subMessage = start + lenght < message.Length ? message.Substring(start, lenght) : message.Substring(start);
                 if(BigInteger.TryParse(subMessage, out var value) && value >= PublicKey)
                 {
                     subMessage = subMessage.Remove(subMessage.Length - 1);
@@ -174,7 +171,7 @@ namespace RSA
             return dividedMessage;
         }
 
-        private string ConvertToString(IEnumerable<string> dividedMessage)
+        private static string ConvertToString(IEnumerable<string> dividedMessage)
         {
             var returnMessage = new StringBuilder();
 
@@ -221,7 +218,7 @@ namespace RSA
                     }
                 }
 
-                for (int i = 0; i < numberOfTests; i++)
+                for (var i = 0; i < numberOfTests; i++)
                 {
                     var r = LongRandom(2, value);
                     if (BigInteger.Abs(ModularMultiplication((long)Math.Pow(strongPrime, d), (long)Math.Pow(2, (double)r), value)) == 1)
@@ -233,7 +230,7 @@ namespace RSA
             return true;
         }
 
-        private static int[] FindStrongPrimeBases(BigInteger value)
+        private static IEnumerable<int> FindStrongPrimeBases(BigInteger value)
         {
             var strongPrimesArray = new List<int> { 2, 3};
             if(value > 1373652)
@@ -301,7 +298,7 @@ namespace RSA
             return GenerateRandomInteger(long.MaxValue);
         }
 
-        public BigInteger GenerateRandomInteger(BigInteger max)
+        private static BigInteger GenerateRandomInteger(BigInteger max)
         {
             var randomInteger = LongRandom(2, max);
 
@@ -318,7 +315,7 @@ namespace RSA
             return BigInteger.Abs(ModularMultiplication(longRand, 1, max - min) + min);
         }
 
-        public BigInteger GenerateRandomPrimeInteger()
+        private BigInteger GenerateRandomPrimeInteger()
         {
             return GenerateRandomPrimeInteger(long.MaxValue);
         }
@@ -373,7 +370,7 @@ namespace RSA
             return (firstValue == 1 || secondValue == 1);
         }
 
-        private void SwapIntegers(ref BigInteger firstValue, ref BigInteger secondValue)
+        private static void SwapIntegers(ref BigInteger firstValue, ref BigInteger secondValue)
         {
             var saveValue = firstValue;
             firstValue = secondValue;

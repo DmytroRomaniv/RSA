@@ -8,6 +8,8 @@ namespace SupeRSAfe.DTO.Models
     public class KeyDTO
     {
         public int Id { get; set; }
+        
+        public string UserId { get; set; }
 
         public string SecretKey { get; set; }
 

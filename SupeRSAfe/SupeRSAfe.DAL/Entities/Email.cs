@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SupeRSAfe.DAL.Entities
 {
+    [Serializable]
     public class Email
     {
         public int Id { get; set; }

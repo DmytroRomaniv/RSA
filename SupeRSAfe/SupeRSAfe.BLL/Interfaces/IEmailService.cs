@@ -9,9 +9,9 @@ namespace SupeRSAfe.BLL.Interfaces
 {
     public interface IEmailService
     {
-        void Create(EmailDTO emailDTO, User user);
+        byte[] Create(EmailDTO emailDTO, User user);
 
-        void Create(EmailDTO emailDTO, User user, string pValue, string qValue);
+        byte[] Create(EmailDTO emailDTO, User user, string pValue, string qValue);
 
         void Delete(EmailDTO email);
 

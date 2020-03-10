@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RSA.Tests", "RSA.Tests\RSA.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SupeRSAfe.DTO", "SupeRSAfe.DTO\SupeRSAfe.DTO.csproj", "{86778467-43AB-45E8-BA65-0F322F282407}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hashing", "Hashing\Hashing.csproj", "{A1C8870B-D5D8-4D08-8FEE-F8ED337AF634}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{86778467-43AB-45E8-BA65-0F322F282407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86778467-43AB-45E8-BA65-0F322F282407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86778467-43AB-45E8-BA65-0F322F282407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1C8870B-D5D8-4D08-8FEE-F8ED337AF634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1C8870B-D5D8-4D08-8FEE-F8ED337AF634}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1C8870B-D5D8-4D08-8FEE-F8ED337AF634}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1C8870B-D5D8-4D08-8FEE-F8ED337AF634}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

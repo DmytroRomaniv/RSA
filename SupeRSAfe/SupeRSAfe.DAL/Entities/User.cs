@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SupeRSAfe.DAL.Entities
 {
+    [Serializable]
     public class User: IdentityUser
     {
     }
